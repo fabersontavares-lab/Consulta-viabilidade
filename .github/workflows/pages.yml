@@ -1,4 +1,4 @@
-name: Publicar Consulta de Viabilidade no GitHub Pages
+name: Publicar site no GitHub Pages
 
 on:
   push:
