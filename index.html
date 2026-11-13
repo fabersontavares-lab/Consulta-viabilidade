@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Consulta de Viabilidade</title>
+<style>
+:root{--purple:#5f4b68;--purple2:#78617f;--line:#ddd;--text:#333;--blue:#1683db}*{box-sizing:border-box}body{margin:0;background:#5b4b63;color:var(--text);font:14px Arial,sans-serif;background-image:linear-gradient(135deg,#6f5a78,#4d4259)}.wrap{max-width:1440px;margin:auto;padding:22px 24px 28px;min-height:100vh}.top{display:flex;justify-content:space-between;align-items:center;color:#fff;margin-bottom:18px}.title{font-size:40px;font-weight:700}.brand{font-size:38px;letter-spacing:-2px;font-weight:300}.filters{display:grid;grid-template-columns:repeat(6,1fr);gap:18px;margin-bottom:18px}.field,.panel,.tablebox{background:#fff}.field{padding:9px 11px 10px}.field label{display:block;font-size:22px;margin-bottom:7px}.field input,.field select{width:100%;height:34px;border:1px solid #ddd;background:#fff;padding:5px 8px;color:#666;font-size:14px}.actions{display:flex;gap:8px;margin:10px 0 18px}.btn{border:0;padding:10px 18px;cursor:pointer;font-weight:bold;border-radius:3px}.primary{background:#1683db;color:#fff}.secondary{background:#eee;color:#555}.cards{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-bottom:20px}.panel{padding:10px;min-height:205px;overflow:auto}.panel h3{font-size:15px;font-weight:normal;margin:0 0 8px}.summary{width:100%;border-collapse:collapse}.summary th,.summary td{text-align:left;padding:5px 7px;border-bottom:1px solid #eee;white-space:nowrap}.summary th{font-weight:normal;border-bottom:1px solid var(--blue)}.summary td:nth-child(n+2),.summary th:nth-child(n+2){text-align:right}.summary tr:nth-child(even){background:#eee}.total{font-weight:bold}.tablebox{padding:10px;overflow:auto}.result-title{margin:0 0 8px;font-size:15px}.data{border-collapse:collapse;width:100%;min-width:900px}.data th,.data td{padding:6px;border-bottom:1px solid #eee;text-align:left;white-space:nowrap}.data th{font-weight:normal;border-bottom:1px solid var(--blue)}.data tr:nth-child(even){background:#eee}.empty{padding:30px;text-align:center;color:#777}.notice{color:#fff;font-size:12px;margin-top:14px;opacity:.8}@media(max-width:950px){.filters{grid-template-columns:repeat(3,1fr)}.cards{grid-template-columns:1fr}.title{font-size:30px}}@media(max-width:560px){.filters{grid-template-columns:1fr 1fr}.wrap{padding:14px}.brand{font-size:25px}}
+</style></head>
+<body><main class="wrap"><header class="top"><div class="title">Consulta de Viabilidade</div><div class="brand">Linx</div></header>
+<section class="filters">
+<div class="field"><label>Estado</label><select id="estado"><option value="">Todos</option></select></div>
+<div class="field"><label>Cidade</label><input id="cidade" placeholder="Todos"></div>
+<div class="field"><label>Bairro</label><input id="bairro" placeholder="Todos"></div>
+<div class="field"><label>Endereço</label><input id="endereco" placeholder="Todos"></div>
+<div class="field"><label>CEP</label><input id="cep" placeholder="Todos"></div>
+<div class="field"><label>Classificação</label><select id="classificacao"><option value="">Todos</option></select></div>
+</section><div class="actions"><button class="btn primary" onclick="consultar()">Consultar</button><button class="btn secondary" onclick="limpar()">Limpar filtros</button></div>
+<section class="cards"><div class="panel"><h3>Classificação</h3><table class="summary"><thead><tr><th>Classificação</th><th>Contagem</th><th>Média mensal</th></tr></thead><tbody id="byClass"></tbody></table></div><div class="panel"><h3>Operadora (Produto)</h3><table class="summary"><thead><tr><th>Operadora</th><th>Contagem</th><th>Média mensal</th></tr></thead><tbody id="byOp"></tbody></table></div></section>
+<section class="tablebox"><h3 class="result-title" id="resultTitle">Resultados da consulta</h3><table class="data"><thead><tr><th>Estado</th><th>Cidade</th><th>Bairro</th><th>Endereço</th><th>CEP</th><th>Operadora</th><th>Classificação</th><th>Valor mensal</th></tr></thead><tbody id="rows"></tbody></table></section>
+<div class="notice">Página pública com visualização limitada. Esta publicação contém apenas dados de demonstração; conecte um endpoint seguro no servidor para disponibilizar a base real sem expô-la ao navegador.</div></main>
+<script>
+/* Para produção, defina API_URL em um backend seguro. O navegador deve receber somente os registros já filtrados. */
+const demo=[
+{estado:'PB',cidade:'JOAO PESSOA',bairro:'AGUA FRIA',endereco:'RODOVIA BR-230, 1957',cep:'58053002',operadora:'VIVO S/A',classe:'Banda Larga > 100 Mbps',valor:128.54},
+{estado:'PB',cidade:'JOAO PESSOA',bairro:'ALTiplano CABO BRANCO',endereco:'AV JOAO CIRILO DA SILVA, 00221',cep:'58046005',operadora:'EMBRATEL.',classe:'Banda Larga <= 100 Mbps',valor:195.72},
+{estado:'PB',cidade:'JOAO PESSOA',bairro:'ALTiplano CABO BRANCO',endereco:'RUA POETA TARGINO TEIXEIRA, 251',cep:'58046090',operadora:'OI S/A',classe:'IP Dedicado < 10 Mbps',valor:338.10},
+{estado:'PB',cidade:'JOAO PESSOA',bairro:'Distrito Industrial',endereco:'RUA ESTEVAO BRETT, 546 A',cep:'58082001',operadora:'VIVO S/A',classe:'IP Dedicado 10-30 Mbps',valor:406.44},
+{estado:'PB',cidade:'JOAO PESSOA',bairro:'JAGUARIBE',endereco:'AVENIDA CAPITAO JOSE PESSOA, 1140',cep:'58015170',operadora:'BRISANET',classe:'IP Dedicado 30-50 Mbps',valor:357.45},
+{estado:'PB',cidade:'JOAO PESSOA',bairro:'MANAIRA',endereco:'RUA MANOEL ARRUDA CAVALCANTI',cep:'58037000',operadora:'EMBRATEL.',classe:'Banda Larga > 100 Mbps',valor:149.90}];
+let data=demo;
+const $=id=>document.getElementById(id);const norm=x=>(x||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function init(){[...new Set(data.map(x=>x.estado))].sort().forEach(x=>estado.add(new Option(x,x)));[...new Set(data.map(x=>x.classe))].sort().forEach(x=>classificacao.add(new Option(x,x)));consultar()}
+function consultar(){let f={estado:estado.value,cidade:cidade.value,bairro:bairro.value,endereco:endereco.value,cep:cep.value,classificacao:classificacao.value};let r=data.filter(x=>Object.entries(f).every(([k,v])=>!v||norm(x[k]).includes(norm(v))));render(r)}
+function render(r){$('resultTitle').textContent=`Resultados da consulta — ${r.length} registro(s)`;$('rows').innerHTML=r.length?r.map(x=>`<tr><td>${x.estado}</td><td>${x.cidade}</td><td>${x.bairro}</td><td>${x.endereco}</td><td>${x.cep}</td><td>${x.operadora}</td><td>${x.classe}</td><td>R$ ${x.valor.toFixed(2).replace('.',',')}</td></tr>`).join(''):`<tr><td colspan="8" class="empty">Nenhum registro encontrado.</td></tr>`;group(r,'classe','byClass');group(r,'operadora','byOp')}
+function group(r,key,id){let m={};r.forEach(x=>{m[x[key]]??=[];m[x[key]].push(x)});let arr=Object.entries(m);$(id).innerHTML=arr.length?arr.map(([k,v])=>`<tr><td>${k}</td><td>${v.length}</td><td>R$ ${(v.reduce((a,x)=>a+x.valor,0)/v.length).toFixed(2).replace('.',',')}</td></tr>`).join(''):`<tr><td colspan="3" class="empty">Sem dados</td></tr>`}
+function limpar(){document.querySelectorAll('input').forEach(x=>x.value='');estado.value='';classificacao.value='';consultar()}init();
+</script></body></html>
